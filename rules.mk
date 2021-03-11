@@ -2,4 +2,5 @@ MCU = atmega32u4
 # BOOTLOADER = caterina
 BOOTLOADER = atmel-dfu
 SPLIT_KEYBOARD = yes
-DEFAULT_FOLDER = nofle/rev1
+DEFAULT_FOLDER = sofle/rev1
+WPM_ENABLE = yes
