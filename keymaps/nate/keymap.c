@@ -33,9 +33,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            | LGUI | Bspc | LCTR |LOWER | /Enter  /       \Space \  |RAISE | RCTR | RAlt | RGUI |
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
-     */
-
-    [_QWERTY] = LAYOUT(KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC, KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE, XXXXXXX, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_ENT, KC_LGUI, KC_BSPC, KC_LCTRL, KC_LOWER, KC_ENT, KC_SPC, KC_RAISE, KC_RCTRL, KC_RALT, KC_RGUI),
+     */= LAYOUT(KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC, KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE, XXXXXXX, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_ENT, KC_LGUI, KC_BSPC, KC_LCTRL, KC_LOWER, KC_ENT, KC_SPC, KC_RAISE, KC_RCTRL, KC_RALT, KC_RGUI),
     /*
      * COLEMAK
      * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -93,8 +91,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
      */
-    [_RAISE] = LAYOUT(
-    _______, _______, _______, _______, _______, _______,               _______, _______, _______, _______, _______, _______, 
+    [_RAISE] = LAYOUT
+    (_______, _______, _______, _______, _______, _______,               _______, _______, _______, _______, _______, _______, 
     _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC,                     KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, KC_DLINE, KC_BSPC, 
     _______, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_CAPS,                 KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_DEL, KC_BSPC, 
     _______, KC_UNDO, KC_CUT, KC_COPY, KC_PASTE, XXXXXXX, _______, _______, XXXXXXX, KC_LSTRT, XXXXXXX, KC_LEND, XXXXXXX, _______, 
@@ -234,7 +232,8 @@ static void render_logo(void) {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
-            oled_write_raw_P(nateskeeb_logo, sizeof(nateskeeb_logo));
+
+    oled_write_raw_P(nateskeeb_logo, sizeof(nateskeeb_logo));
 }
 
 
@@ -243,26 +242,6 @@ static void render_logo(void) {
 static void print_status_narrow(void) {
     // Print current mode
     oled_write_P(PSTR("\n\n"), false);
-    // oled_write_P(PSTR("N"), false);
-    // oled_write_P(PSTR(" Keeb"), false);
-    oled_write_ln_P(PSTR("MODE"), false);
-    oled_write_ln_P(PSTR(""), false);
-    if (keymap_config.swap_lctl_lgui) {
-        oled_write_ln_P(PSTR("MAC"), false);
-    } else {
-        oled_write_ln_P(PSTR("WIN"), false);
-    }
-
-    switch (get_highest_layer(default_layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("Qwrt"), false);
-            break;
-        case _COLEMAK:
-            oled_write_ln_P(PSTR("Clmk"), false);
-            break;
-        default:
-            oled_write_P(PSTR("Undef"), false);
-    }
     oled_write_P(PSTR("\n\n"), false);
     // Print current layer
     oled_write_ln_P(PSTR("LAYER"), false);
@@ -278,7 +257,7 @@ static void print_status_narrow(void) {
             oled_write_P(PSTR("Lower"), false);
             break;
         case _ADJUST:
-            oled_write_P(PSTR("DUBS\n"), false);
+            oled_write_P(PSTR("Dubs\n"), false);
             break;
         default:
             oled_write_ln_P(PSTR("Undef"), false);
@@ -286,6 +265,7 @@ static void print_status_narrow(void) {
     oled_write_P(PSTR("\n\n"), false);
     // led_t led_usb_state = host_keyboard_led_state();
     // oled_write_ln_P(PSTR("CPSLK"), led_usb_state.caps_lock);
+xprintf("KL: row: %u, column: %u, pressed: %u\n", record->event.key.col, record->event.key.row, record->event.pressed);
     oled_write_P(PSTR("WPM:\n"), false);
     sprintf(wpm_str, "%03d", get_current_wpm());
     oled_write(wpm_str, false);
@@ -305,8 +285,7 @@ void oled_task_user(void) {
     } else {
         // render_anim_cat();
         render_logo();
-        oled_scroll_right();
-        oled_scroll_set_speed(3);
+        // oled_scroll_right();
     }
 }
 
@@ -314,16 +293,6 @@ void oled_task_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case KC_QWERTY:
-            if (record->event.pressed) {
-                set_single_persistent_default_layer(_QWERTY);
-            }
-            return false;
-        case KC_COLEMAK:
-            if (record->event.pressed) {
-                set_single_persistent_default_layer(_COLEMAK);
-            }
-            return false;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
@@ -485,12 +454,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef ENCODER_ENABLE
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
+
 void encoder_update_user(uint8_t index, _Bool clockwise) {
     if (index == 0) {
         if (clockwise) {
-        tap_code(KC_DOWN);
+        tap_code(KC_RIGHT);
         } else {
-        tap_code(KC_UP);
+        tap_code(KC_LEFT);
         }
     } else if (index == 1) {
         if (clockwise) {
@@ -509,7 +479,7 @@ void encoder_update_user(uint8_t index, _Bool clockwise) {
 
         void matrix_scan_user(void) {
             if (is_alt_tab_active) {
-                if (timer_elapsed(alt_tab_timer) > 650) {
+                if (timer_elapsed(alt_tab_timer) > 900) {
                 unregister_code(KC_LALT);
                 is_alt_tab_active = false;
                 }
