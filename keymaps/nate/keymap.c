@@ -189,6 +189,19 @@ static void print_status_narrow(void) {
     oled_write_P(PSTR("WPM:\n"), false);
     sprintf(wpm_str, "%03d", get_current_wpm());
     oled_write(wpm_str, false);
+
+//     #define MATRIX_DISPLAY_X 0
+// #define MATRIX_DISPLAY_Y 18
+
+//   for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
+//     for (uint8_t y = 0; y < MATRIX_COLS; y++) {
+//       draw_pixel(MATRIX_DISPLAY_X + y + 2, MATRIX_DISPLAY_Y + x + 2,(matrix_get_row(x) & (1 << y)) > 0, NORM);
+//     }
+//   }
+//   draw_rect_soft(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y, 19, 9, PIXEL_ON, NORM);
+//   /* hadron oled location on thumbnail */
+//   draw_rect_filled_soft(MATRIX_DISPLAY_X + 14, MATRIX_DISPLAY_Y + 2, 3, 1, PIXEL_ON, NORM);
+
 }
 
 
