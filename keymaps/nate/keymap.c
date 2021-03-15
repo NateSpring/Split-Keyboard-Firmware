@@ -378,8 +378,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case KC_GIT:
             if (record->event.pressed){
-                SEND_STRING("git add . && git commit -m 'Automated Keeb Commit' && git push origin master");
-                xprintf("KL: row: %u, column: %u, pressed: %u\n", record->event.key.col, record->event.key.row, record->event.pressed);
+                tap_code(KC_UP);
+                tap_code(KC_ENT);
             }else {
             // when keycode QMKBEST is released
             }
