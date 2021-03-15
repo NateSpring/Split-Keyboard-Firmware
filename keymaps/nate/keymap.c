@@ -1,22 +1,19 @@
 #include QMK_KEYBOARD_H
 #include <stdio.h>
-char wpm_str[10];
 
-// Note for later:
-// Bongo Cat Example
-// https://github.com/Ocelot08/QMKanim/blob/cbca5969abba9900665e25918c4ba809350fa063/keymap.c
-//
+char wpm_str[10];
+static char current_alpha_oled = '\0';
+
 
 enum sofle_layers {
     /* _M_XYZ = Mac Os, _W_XYZ = Win/Linux */
     _QWERTY,
-    _COLEMAK,
     _LOWER,
     _RAISE,
     _ADJUST,
 };
 
-enum custom_keycodes { KC_QWERTY = SAFE_RANGE, KC_COLEMAK, KC_LOWER, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND, KC_DLINE, KC_GIT };
+enum custom_keycodes { KC_QWERTY = SAFE_RANGE, KC_LOWER, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND, KC_DLINE, KC_GIT };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -33,29 +30,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            | LGUI | Bspc | LCTR |LOWER | /Enter  /       \Space \  |RAISE | RCTR | RAlt | RGUI |
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
-     */= LAYOUT(KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC, KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE, XXXXXXX, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_ENT, KC_LGUI, KC_BSPC, KC_LCTRL, KC_LOWER, KC_ENT, KC_SPC, KC_RAISE, KC_RCTRL, KC_RALT, KC_RGUI),
-    /*
-     * COLEMAK
-     * ,-----------------------------------------.                    ,-----------------------------------------.
-     * |  `   |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |  `   |
-     * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | ESC  |   Q  |   W  |   F  |   P  |   G  |                    |   J  |   L  |   U  |   Y  |   ;  | Bspc |
-     * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | TAB  |   A  |   R  |   S  |   T  |   D  |-------.    ,-------|   H  |   N  |   E  |   I  |   O  |  '   |
-     * |------+------+------+------+------+------|  MUTE |    |       |------+------+------+------+------+------|
-     * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   K  |   M  |   ,  |   .  |   /  |RShift|
-     * `-----------------------------------------/       /     \      \-----------------------------------------'
-     *            | LGUI | LAlt | LCTR |LOWER | /Enter  /       \Space \  |RAISE | RCTR | RAlt | RGUI |
-     *            |      |      |      |      |/       /         \      \ |      |      |      |      |
-     *            `----------------------------------'           '------''---------------------------'
      */
-
-    [_COLEMAK] = LAYOUT(
-        KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,                           KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, 
-        KC_ESC, KC_Q, KC_W, KC_F, KC_P, KC_G,                           KC_J, KC_L, KC_U, KC_Y, KC_SCLN, KC_BSPC, 
-        KC_TAB, KC_A, KC_R, KC_S, KC_T, KC_D,                           KC_H, KC_N, KC_E, KC_I, KC_O, KC_QUOT, 
-        KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE,        XXXXXXX, KC_K, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, 
-        KC_LGUI, KC_LALT, KC_LCTRL, KC_LOWER, KC_ENT,          KC_SPC, KC_RAISE, KC_RCTRL, KC_RALT, KC_RGUI),
+     [_QWERTY]= LAYOUT(KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC, KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_MUTE, XXXXXXX, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_ENT, KC_LGUI, KC_BSPC, KC_LCTRL, KC_LOWER, KC_ENT, KC_SPC, KC_RAISE, KC_RCTRL, KC_RALT, KC_RGUI),
     /* LOWER
      * ,-----------------------------------------.                    ,-----------------------------------------.
      * |      |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
@@ -91,8 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            |      |      |      |      |/       /         \      \ |      |      |      |      |
      *            `----------------------------------'           '------''---------------------------'
      */
-    [_RAISE] = LAYOUT
-    (_______, _______, _______, _______, _______, _______,               _______, _______, _______, _______, _______, _______, 
+    [_RAISE] = LAYOUT(_______, _______, _______, _______, _______, _______,               _______, _______, _______, _______, _______, _______, 
     _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC,                     KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, KC_DLINE, KC_BSPC, 
     _______, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_CAPS,                 KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_DEL, KC_BSPC, 
     _______, KC_UNDO, KC_CUT, KC_COPY, KC_PASTE, XXXXXXX, _______, _______, XXXXXXX, KC_LSTRT, XXXXXXX, KC_LEND, XXXXXXX, _______, 
@@ -101,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ,-----------------------------------------.                    ,-----------------------------------------.
      * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-     * | RESET|      |QWERTY|COLEMAK|      |      |                    |      |      |      |      |      |      |
+     * | RESET|      |QWERTY|      |      |      |                    |      |      |      |      |      |      |
      * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
      * |      |      |Brkt  |Curly | Pths |  LT  |-------.    ,-------|  GT  | Pths | Curly| Brkt |      |      |
      * |------+------+------+------+------+------|  MUTE |    |       |------+------+------+------+------+------|
@@ -118,77 +93,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX, 
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______)};
 
-#ifdef OLED_DRIVER_ENABLE
-
-// #define ANIM_FRAME_DURATION 250
-// #define ANIM_SIZE 520 // number of bytes in array, minimize for adequate firmware size, max is 1024. originally 636
-// #define XANIM_SIZE 650
-// #define CAT_FRAMES 2
-// #define TAP_FRAMES 3
-// #define X_FRAMES 6
-// uint32_t anim_timer = 0;
-// uint32_t anim_sleep = 0;
-// uint8_t current_tap_frame = 0;
-// bool anim_phase = false;
-
-// void animation_run(void) {
-// 	if(timer_elapsed32(anim_sleep) > OLED_TIMEOUT) {
-// 		oled_off();
-// 	} else {
-// 		if(timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
-// 			anim_timer = timer_read32();
-// 			anim_phase = true;
-// 			}
-// 		}
-// }
-
-// static void render_anim_cat(void) {
-// 	static const char PROGMEM tap[CAT_FRAMES][ANIM_SIZE] = {
-// 		{
-//         // 'CAT_01', 128x32px
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x40, 0x40, 0xe0, 0x20, 0x10, 0, 0, 0xf0, 0x90, 0x60, 0xc4, 0x8a, 0x12, 0x32, 0x4c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 
-// 		0, 0, 0, 0, 0, 0x80, 0x40, 0x40, 0x20, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x08, 0x04, 0x02, 0x01, 0x01, 0x02, 0x0c, 0x30, 0x40, 0x80, 0, 0, 0, 0, 0, 0, 0, 0xf8, 0xf8, 0xf8, 0xf8, 0, 0, 0, 0, 0, 0x80, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x03, 0x06, 0, 0, 
-// 		0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1e, 0xe1, 0, 0, 0x01, 0x01, 0x02, 0x02, 0x81, 0x80, 0x80, 0, 0, 0x80, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0x30, 0x30, 0, 0, 0x01, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x43, 0x87, 0x07, 0x01, 0, 0xb8, 0xbc, 0xbe, 0x9f, 0x5f, 0x5f, 0x4f, 0x4c, 0x20, 0x20, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x08, 0x08, 0x08, 0x08, 0x08, 0x04, 0x04, 0x04, 0x02, 
-// 		0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x70, 0x0c, 0x03, 0, 0, 0x18, 0x06, 0x01, 0x80, 0x80, 0x80, 0x43, 0x7c, 0x41, 0x41, 0x40, 0x40, 0x20, 0x21, 0x22, 0x12, 0x11, 0x11, 0x11, 0x09, 0x08, 0x08, 0x08, 0x08, 0x04, 0x04, 0x08, 0x08, 0x10, 0x10, 0x10, 
-// 		0x10, 0x10, 0x11, 0x0f, 0x01, 0x3d, 0x7c, 0xfc, 0xfc, 0xfc, 0xfc, 0xfc, 0x3c, 0x0c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x40, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x10, 0x08, 0x08, 0x08, 0x04, 0x04, 0x04, 0x04, 0x04, 0x02, 0x03, 0x02, 0x02, 0x01, 0x01, 
-// 		0x01, 0x01, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x03, 0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-// 		},
-//         {
-// 		// 'CAT_02', 128x32px
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 0, 0, 0, 0, 0, 0x80, 0x40, 0x40, 0x20, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x08, 0x04, 0x02, 0x01, 0x01, 0x02, 0x0c, 0x30, 0x40, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x40, 0x20, 0x20, 0x60, 0x90, 0x10, 0, 0, 0xf0, 0x48, 0x50, 0x30, 0xe0, 0x82, 0x0e, 0x3b, 0x69, 0x0f, 0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1e, 0xe1, 0, 0, 0x01, 0x01, 0x02, 0x02, 0x01, 0, 0, 0, 0, 0x80, 0x80, 0, 0, 0, 0, 0, 
-// 		0, 0, 0, 0, 0x80, 0, 0x30, 0x30, 0, 0, 0x01, 0xe1, 0x1a, 0x06, 0x01, 0x01, 0x01, 0x01, 0x82, 0x7c, 0, 0, 0x80, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x20, 0x20, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x08, 0x08, 0x08, 0x08, 0x08, 0x04, 0x04, 0x04, 0x02, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x03, 0, 0, 0, 0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x70, 0x0c, 0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x01, 0, 0x40, 0xa0, 0x21, 0x22, 0x12, 0x11, 0x11, 0x11, 0x09, 0x08, 0x08, 0x08, 0x08, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80, 0x80, 0x80, 0x40, 0x40, 0x40, 0x40, 0x40, 0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x10, 0x10, 0x08, 0x08, 0x08, 0x04, 0x04, 0x04, 0x04, 0x04, 0x02, 0x03, 0x7a, 0x7a, 0x79, 0x79, 0x79, 0x79, 0x39, 0x31, 0x02, 0x02, 0x04, 0x04, 0x08, 0x08, 0x08, 0x88, 0x88, 0x87, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-// 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-//         },
-//     };
-	
-// 	if(anim_phase == true) {
-// 		current_tap_frame = (current_tap_frame + 1) % CAT_FRAMES;
-// 		oled_write_raw_P(tap[abs((CAT_FRAMES-1)-current_tap_frame)], ANIM_SIZE);
-// 		anim_phase = false;
-// 	}
-
-// 	animation_run();
-// }
-
-
-
 
 // WPM
 #define IDLE_FRAMES 5
 #define IDLE_SPEED 40 // below this wpm value your animation will idle
-
 // #define PREP_FRAMES 1 // uncomment if >1
-
 #define TAP_FRAMES 2
 #define TAP_SPEED 60 // above this wpm value typing animation to triggere
-
 #define ANIM_FRAME_DURATION 200 // how long each frame lasts in ms
 // #define SLEEP_TIMER 60000 // should sleep after this period of 0 wpm, needs fixing
 #define ANIM_SIZE 636 // number of bytes in array, minimize for adequate firmware size, max is 1024
-
 uint32_t anim_timer = 0;
 uint32_t anim_sleep = 0;
 uint8_t current_idle_frame = 0;
@@ -242,11 +156,9 @@ static void render_logo(void) {
 static void print_status_narrow(void) {
     // Print current mode
     oled_write_P(PSTR("\n\n"), false);
-    oled_write_P(PSTR("\n\n"), false);
     // Print current layer
     oled_write_ln_P(PSTR("LAYER"), false);
     switch (get_highest_layer(layer_state)) {
-        case _COLEMAK:
         case _QWERTY:
             oled_write_P(PSTR("Base\n"), false);
             break;
@@ -265,7 +177,15 @@ static void print_status_narrow(void) {
     oled_write_P(PSTR("\n\n"), false);
     // led_t led_usb_state = host_keyboard_led_state();
     // oled_write_ln_P(PSTR("CPSLK"), led_usb_state.caps_lock);
-xprintf("KL: row: %u, column: %u, pressed: %u\n", record->event.key.col, record->event.key.row, record->event.pressed);
+    oled_write_P(PSTR("Key:\n"), false);
+            oled_write_P(PSTR("( "), false);
+            if (current_alpha_oled == '\0') {
+                oled_write_char('*', false);
+            } else {
+                oled_write_char(current_alpha_oled, false);
+            }
+            oled_write_P(PSTR(" )\n"), false);
+
     oled_write_P(PSTR("WPM:\n"), false);
     sprintf(wpm_str, "%03d", get_current_wpm());
     oled_write(wpm_str, false);
@@ -285,14 +205,18 @@ void oled_task_user(void) {
     } else {
         // render_anim_cat();
         render_logo();
-        // oled_scroll_right();
+        oled_scroll_left();
     }
 }
 
-#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
+        case KC_QWERTY:
+            if (record->event.pressed) {
+                set_single_persistent_default_layer(_QWERTY);
+            }
+            return false;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
@@ -442,8 +366,166 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_GIT:
             if (record->event.pressed){
                 SEND_STRING("git add . && git commit -m 'Automated Keeb Commit' && git push origin master");
+                xprintf("KL: row: %u, column: %u, pressed: %u\n", record->event.key.col, record->event.key.row, record->event.pressed);
             }else {
             // when keycode QMKBEST is released
+            }
+            return false;
+            break;
+        case KC_A:
+            if (record->event.pressed) {
+                current_alpha_oled = 'A';
+            } else {
+            }
+            break;
+        case KC_B:
+            if (record->event.pressed) {
+                current_alpha_oled = 'B';
+            } else {
+            }
+            break;
+        case KC_C:
+            if (record->event.pressed) {
+                current_alpha_oled = 'C';
+            } else {
+            }
+            break;
+        case KC_D:
+            if (record->event.pressed) {
+                current_alpha_oled = 'D';
+            } else {
+            }
+            break;
+        case KC_E:
+            if (record->event.pressed) {
+                current_alpha_oled = 'E';
+            } else {
+            }
+            break;
+        case KC_F:
+            if (record->event.pressed) {
+                current_alpha_oled = 'F';
+            } else {
+            }
+            break;
+        case KC_G:
+            if (record->event.pressed) {
+                current_alpha_oled = 'G';
+            } else {
+            }
+            break;
+        case KC_H:
+            if (record->event.pressed) {
+                current_alpha_oled = 'H';
+            } else {
+            }
+            break;
+        case KC_I:
+            if (record->event.pressed) {
+                current_alpha_oled = 'I';
+            } else {
+            }
+            break;
+        case KC_J:
+            if (record->event.pressed) {
+                current_alpha_oled = 'J';
+            } else {
+            }
+            break;
+        case KC_K:
+            if (record->event.pressed) {
+                current_alpha_oled = 'K';
+            } else {
+            }
+            break;
+        case KC_L:
+            if (record->event.pressed) {
+                current_alpha_oled = 'L';
+            } else {
+            }
+            break;
+        case KC_M:
+            if (record->event.pressed) {
+                current_alpha_oled = 'M';
+            } else {
+            }
+            break;
+        case KC_N:
+            if (record->event.pressed) {
+                current_alpha_oled = 'N';
+            } else {
+            }
+            break;
+        case KC_O:
+            if (record->event.pressed) {
+                current_alpha_oled = 'O';
+            } else {
+            }
+            break;
+        case KC_P:
+            if (record->event.pressed) {
+                current_alpha_oled = 'P';
+            } else {
+            }
+            break;
+        case KC_Q:
+            if (record->event.pressed) {
+                current_alpha_oled = 'Q';
+            } else {
+            }
+            break;
+        case KC_R:
+            if (record->event.pressed) {
+                current_alpha_oled = 'R';
+            } else {
+            }
+            break;
+        case KC_S:
+            if (record->event.pressed) {
+                current_alpha_oled = 'S';
+            } else {
+            }
+            break;
+        case KC_T:
+            if (record->event.pressed) {
+                current_alpha_oled = 'T';
+            } else {
+            }
+            break;
+        case KC_U:
+            if (record->event.pressed) {
+                current_alpha_oled = 'U';
+            } else {
+            }
+            break;
+        case KC_V:
+            if (record->event.pressed) {
+                current_alpha_oled = 'V';
+            } else {
+            }
+            break;
+        case KC_W:
+            if (record->event.pressed) {
+                current_alpha_oled = 'W';
+            } else {
+            }
+            break;
+        case KC_X:
+            if (record->event.pressed) {
+                current_alpha_oled = 'X';
+            } else {
+            }
+            break;
+        case KC_Y:
+            if (record->event.pressed) {
+                current_alpha_oled = 'Y';
+            } else {
+            }
+            break;
+        case KC_Z:
+            if (record->event.pressed) {
+                current_alpha_oled = 'Z';
+            } else {
             }
             break;
 
@@ -454,7 +536,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef ENCODER_ENABLE
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
-
 void encoder_update_user(uint8_t index, _Bool clockwise) {
     if (index == 0) {
         if (clockwise) {
@@ -470,6 +551,8 @@ void encoder_update_user(uint8_t index, _Bool clockwise) {
             }
             alt_tab_timer = timer_read();
             tap_code16(KC_TAB);
+
+
             } else {
             alt_tab_timer = timer_read();
             tap_code16(S(KC_TAB));
@@ -479,7 +562,7 @@ void encoder_update_user(uint8_t index, _Bool clockwise) {
 
         void matrix_scan_user(void) {
             if (is_alt_tab_active) {
-                if (timer_elapsed(alt_tab_timer) > 900) {
+                if (timer_elapsed(alt_tab_timer) > 650) {
                 unregister_code(KC_LALT);
                 is_alt_tab_active = false;
                 }
