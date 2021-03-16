@@ -2,9 +2,14 @@
 #include <stdio.h>
 
 char wpm_str[10];
+char mtx_str[10];
+char kp_str[10];
 
-#define MATRIX_DISPLAY_X 15
-#define MATRIX_DISPLAY_Y 90
+int KEY_PRESSES = 0;
+
+#define MATRIX_DISPLAY_X 8
+#define MATRIX_DISPLAY_Y 110
+
 
 
 enum sofle_layers {
@@ -156,8 +161,6 @@ static void render_logo(void) {
 
 // Master OLED
 static void print_status_narrow(void) {
-    // Print current mode
-    oled_write_P(PSTR("\n\n"), false);
     // Print current layer
     oled_write_ln_P(PSTR("LAYER"), false);
     switch (get_highest_layer(layer_state)) {
@@ -176,13 +179,26 @@ static void print_status_narrow(void) {
         default:
             oled_write_ln_P(PSTR("Undef"), false);
     }
-    oled_write_P(PSTR("\n\n"), false);
+    oled_write_P(PSTR("\n"), false);
     // led_t led_usb_state = host_keyboard_led_state();
     // oled_write_ln_P(PSTR("CPSLK"), led_usb_state.caps_lock);
     oled_write_P(PSTR("WPM:\n"), false);
-    sprintf(wpm_str, "%03d", get_current_wpm());
+    sprintf(wpm_str, "%03d\n\n", get_current_wpm());
     oled_write(wpm_str, false);
+
+    for (uint8_t c = 0; c < MATRIX_COLS; c++) {
+        for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
+            if (matrix_is_on(r, c)) {
+            sprintf(mtx_str, "R:%d\nC:%d\n\n", r, c);
+            break;
+            }
+        }
+    }
+    oled_write(mtx_str, false);
+    sprintf(kp_str, "KP:\n%d", KEY_PRESSES);
+    oled_write(kp_str, false);
 }
+
 
 static void print_matrix(void){
     for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
@@ -190,12 +206,24 @@ static void print_matrix(void){
             if (x >= 5){
             oled_write_pixel(MATRIX_DISPLAY_X - y + 14, MATRIX_DISPLAY_Y + x - 3,(matrix_get_row(x) & (1 << y))> 0);
             }else{
-            oled_write_pixel(MATRIX_DISPLAY_X + y + 2, MATRIX_DISPLAY_Y + x + 2,(matrix_get_row(x) & (1 << y))> 0);
+                //           left and right             up and down
+            oled_write_pixel(MATRIX_DISPLAY_X + y + 2, MATRIX_DISPLAY_Y + x + 2,(matrix_get_row(x) & (1 << y))> 0);   
         }}
     }
-//   draw_rect_soft(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y, 19, 9, PIXEL_ON, NORM);
-//   draw_rect_filled_soft(MATRIX_DISPLAY_X + 14, MATRIX_DISPLAY_Y + 2, 3, 1, PIXEL_ON, NORM);
+    //draw_rect_soft(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y, 19, 9, PIXEL_ON, NORM);
+        //top and bottom lines for keyboard drawing
+        for (uint8_t x = 0; x < 18; x++) {
+            oled_write_pixel(MATRIX_DISPLAY_X + x, MATRIX_DISPLAY_Y - 2,true);   
+            oled_write_pixel(MATRIX_DISPLAY_X + x, MATRIX_DISPLAY_Y + 9,true);   
+        }
+        //side lines for keyboard drawing
+        for (uint8_t y = 0; y < 9; y++) {
+            oled_write_pixel(MATRIX_DISPLAY_X - 1, MATRIX_DISPLAY_Y + y - 1, true);   
+            oled_write_pixel(MATRIX_DISPLAY_X + 18, MATRIX_DISPLAY_Y + y - 1, true);   
+        }
+    
 }
+
 
 
 
@@ -219,6 +247,9 @@ void oled_task_user(void) {
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed){
+        KEY_PRESSES++;
+    }
     switch (keycode) {
         case KC_QWERTY:
             if (record->event.pressed) {
