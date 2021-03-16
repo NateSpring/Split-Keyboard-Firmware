@@ -3,8 +3,8 @@
 
 char wpm_str[10];
 
-#define MATRIX_DISPLAY_X 0
-#define MATRIX_DISPLAY_Y 0
+#define MATRIX_DISPLAY_X 15
+#define MATRIX_DISPLAY_Y 90
 
 
 enum sofle_layers {
@@ -187,16 +187,14 @@ static void print_status_narrow(void) {
 static void print_matrix(void){
     for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
         for (uint8_t y = 0; y < MATRIX_COLS; y++) {
-            if (y > 5){
-            oled_write_pixel(MATRIX_DISPLAY_X + y + 2, MATRIX_DISPLAY_Y + x + 2,(matrix_get_row(x-5) & (1 << y))> 0);
-
+            if (x >= 5){
+            oled_write_pixel(MATRIX_DISPLAY_X - y + 14, MATRIX_DISPLAY_Y + x - 3,(matrix_get_row(x) & (1 << y))> 0);
             }else{
             oled_write_pixel(MATRIX_DISPLAY_X + y + 2, MATRIX_DISPLAY_Y + x + 2,(matrix_get_row(x) & (1 << y))> 0);
         }}
     }
 //   draw_rect_soft(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y, 19, 9, PIXEL_ON, NORM);
 //   draw_rect_filled_soft(MATRIX_DISPLAY_X + 14, MATRIX_DISPLAY_Y + 2, 3, 1, PIXEL_ON, NORM);
-
 }
 
 
