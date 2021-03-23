@@ -28,7 +28,7 @@ enum enc_layers {
     _VERTI,
 };
 
-enum custom_keycodes { KC_QWERTY = SAFE_RANGE, KC_LOWER, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND, KC_DLINE, KC_ALL, KC_TERMINAL, KC_ENC_LAY };
+enum custom_keycodes { KC_QWERTY = SAFE_RANGE, KC_LOWER, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND, KC_DLINE, KC_RELOAD, KC_ALL, KC_TERMINAL, KC_ENC_LAY };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -47,7 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            `----------------------------------'           '------''---------------------------'
      */
      [_QWERTY]= LAYOUT(
-         KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,                  KC_6, KC_7, KC_8, KC_9, KC_0, KC_GRV, 
+         KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5,                  KC_6, KC_7, KC_8, KC_9, KC_0, KC_RELOAD, 
          KC_ESC, KC_Q, KC_W, KC_E, KC_R, KC_T,                  KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC, 
          KC_TAB, KC_A, KC_S, KC_D, KC_F, KC_G,                  KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, 
          KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_ENC_LAY, KC_TERMINAL, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_ENT, 
@@ -88,8 +88,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *            `----------------------------------'           '------''---------------------------'
      */
     [_RAISE] = LAYOUT(
-    _______, _______, _______, _______, _______, _______,               _______, _______, _______, _______, _______, _______, 
-    _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC,                     KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, KC_DLINE, KC_BSPC, 
+    _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC,              KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_F12,              
+    _______, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC,          KC_PGUP, KC_PRVWD, KC_UP, KC_NXTWD, KC_DLINE, KC_BSPC, 
     _______, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_CAPS,                 KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, KC_DEL, KC_BSPC, 
     _______, KC_UNDO, KC_CUT, KC_COPY, KC_PASTE, XXXXXXX, _______, _______, XXXXXXX, KC_LSTRT, XXXXXXX, KC_LEND, XXXXXXX, _______, 
                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
@@ -390,6 +390,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_code(KC_BSPC);
             }
             break;
+        case KC_RELOAD:
+            if (record->event.pressed) {
+                tap_code16(RCS(KC_R));
+            } else {
+            }
+            return false;
         case KC_COPY:
             if (record->event.pressed) {
                 register_mods(mod_config(MOD_LCTL));
@@ -484,6 +490,7 @@ void encoder_update_user(uint8_t index, _Bool clockwise) {
         }
     } else if (index == 1) {
         if (clockwise) {
+            tap_code16(LCTL(KC_Y));
             } else {
             tap_code16(LCTL(KC_Z));
             }
