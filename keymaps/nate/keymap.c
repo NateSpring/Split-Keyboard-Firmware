@@ -23,10 +23,7 @@ enum sofle_layers {
 };
 
 int ENC_LAYER = 0;
-enum enc_layers {
-    _HORIZ,
-    _VERTI,
-};
+
 
 enum custom_keycodes { KC_QWERTY = SAFE_RANGE, KC_LOWER, KC_RAISE, KC_ADJUST, KC_PRVWD, KC_NXTWD, KC_LSTRT, KC_LEND, KC_DLINE, KC_RELOAD, KC_ALL, KC_TERMINAL, KC_ENC_LAY };
 
@@ -196,12 +193,15 @@ static void print_status_narrow(void) {
     oled_write_P(PSTR("\n"), false);
     switch (ENC_LAYER) {
         case 0:
-            oled_write_P(PSTR("<->\n"), false);
+            oled_write_P(PSTR("Vol\n"), false);
             break;
         case 1:
-            oled_write_P(PSTR("^\n"), false);
+            oled_write_P(PSTR("<->\n"), false);
             break;
         case 2:
+            oled_write_P(PSTR("^\n"), false);
+            break;
+        case 3:
             oled_write_P(PSTR("Pg\n"), false);
             break;
         
@@ -454,7 +454,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_ENC_LAY:
             if (record->event.pressed) {
                 ENC_LAYER++;
-                if (ENC_LAYER > 2) {
+                if (ENC_LAYER > 3) {
                     ENC_LAYER = 0;
                 }
             }else{
@@ -471,11 +471,17 @@ void encoder_update_user(uint8_t index, _Bool clockwise) {
     if (index == 0) {
         if (ENC_LAYER == 0){
                 if (clockwise) {
+                tap_code(KC_VOLU);
+                } else {
+                tap_code(KC_VOLD);
+                }
+        } else if (ENC_LAYER == 1){
+                if (clockwise) {
                 tap_code(KC_RIGHT);
                 } else {
                 tap_code(KC_LEFT);
                 }
-        } else if (ENC_LAYER == 1){
+        } else if (ENC_LAYER == 2){
             if (clockwise) {
                 tap_code(KC_UP);
                 } else {
